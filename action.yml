@@ -24,14 +24,14 @@ runs:
       uses: docker://esolang/jq:latest
       run: |
         #Create payload
-        echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'" ' > /tmp/payload.json 
+        echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'",' > /tmp/payload.json 
 
         # labels is optional
-        if [ -n "$INPUT_LABELS" ]; then
+        #if [ -n "$INPUT_LABELS" ]; then
          # convert to JSON format
          formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' -e "s/'/\"/g" | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); gsub(/^"+|"+$/, ""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
-         echo ', "labels": '"$formatted_labels">> /tmp/payload.json
-        fi
+         echo ' "labels": '"$formatted_labels">> /tmp/payload.json
+       # fi
         
         # operation argument is optional
         if [ -n "$INPUT_OPERATION" ]; then
@@ -44,6 +44,7 @@ runs:
         
         cat /tmp/payload.json
         echo "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels"
+        echo "$JWT"
 
         # Make Platform API call to create artifact_info record
         response=$(curl --fail-with-body  -X 'PUT' "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
