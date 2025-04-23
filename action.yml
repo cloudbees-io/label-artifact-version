@@ -41,11 +41,10 @@ runs:
         
         cat /tmp/payload.json
         echo "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels"
-        echo "JWT val = ${JWT}"
 
-        # Make Platform API call to create artifact_info record
+        # Make Platform API call to create label records for artifact info
         response=$(curl --fail-with-body  -X 'PUT' "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
-          -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' \
+          -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
           --data-binary '@/tmp/payload.json') || command_failed=1
        
         # Check curl exit code
