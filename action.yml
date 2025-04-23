@@ -24,7 +24,7 @@ runs:
       uses: docker://esolang/jq:latest
       run: |
         #Create payload
-        echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'",' > /tmp/payload.json 
+        echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json 
 
         # labels is optional
         #if [ -n "$INPUT_LABELS" ]; then
@@ -35,16 +35,16 @@ runs:
         
         # operation argument is optional
         if [ -n "$INPUT_OPERATION" ]; then
-          echo ', "operation": "'"$INPUT_OPERATION"'"' >> /tmp/payload.json
+          echo ', "operation": "'"$INPUT_OPERATION"'" ' >> /tmp/payload.json
         else
-          echo ', "operation": "'"REPLACE"'"' >> /tmp/payload.json
+          echo ', "operation": "'"REPLACE"'" ' >> /tmp/payload.json
         fi
         
         echo ' }' >> /tmp/payload.json
         
         cat /tmp/payload.json
         echo "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels"
-        echo "$JWT"
+        echo $JWT
 
         # Make Platform API call to create artifact_info record
         response=$(curl --fail-with-body  -X 'PUT' "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
