@@ -24,7 +24,7 @@ runs:
       uses: docker://esolang/jq:latest
       run: |
         #Create payload
-        echo '{ "componentId": "'"$INPUT_COMPONENT_ID"'", "artifactId": "'"$INPUT_ARTIFACT_ID"'" ' > /tmp/payload.json 
+        echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'" ' > /tmp/payload.json 
 
         # labels is optional
         if [ -n "$INPUT_LABELS" ]; then
