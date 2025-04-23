@@ -1,4 +1,3 @@
-# label-artifact-version
 = CloudBees action: Add or remove label(s) to an existing artifact version
 
 Use this action to add or remove label(s) to an existing artifact version.
