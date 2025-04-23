@@ -11,7 +11,7 @@ inputs:
     description: 'The unique identifier of the artifact.'
     required: true
   labels:
-    description: 'List of comma-separated labels. If not mentioned, all the existing labels will be removed.'
+    description: 'List of comma-separated labels. If the list is empty, and the operation is "REPLACE", all the existing labels will be removed.'
   operation:
     description: 'The type of action to be performed with labels of an artifact. "ADD", "REMOVE" or "REPLACE" are options available. "REPLACE" is used as default value.'
 
@@ -20,7 +20,7 @@ runs:
   steps:
     - id: labelArtifactVersion
       name: Label Artifact Version
-      uses: docker://esolang/jq:latest
+      #uses: docker://esolang/jq:latest
       run: |
         #Create payload
         echo '{ "componentId": "'"$INPUT_COMPONENT_ID"'", "artifactId": "'"$INPUT_ARTIFACT_ID"'" ' > /tmp/payload.json 
