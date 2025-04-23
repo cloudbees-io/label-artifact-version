@@ -25,20 +25,18 @@ runs:
         #Create payload
         echo '{ "componentId": "'"$INPUT_COMPONENT_ID"'", "artifactId": "'"$INPUT_ARTIFACT_ID"'" ' > /tmp/payload.json 
 
-        // labels is optional, if empty 
-        if [ -n "$INPUT_LABELS" ]; 
-        then
+        # labels is optional, if empty 
+        if [ -n "$INPUT_LABELS" ]; then
          # convert to JSON format
          formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' -e "s/'/\"/g" | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); gsub(/^"+|"+$/, ""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
          echo ', "labels": '"$formatted_labels">> /tmp/payload.json
         fi
         
         # operation argument is optional
-        if [ -n "$INPUT_OPERATION" ]; 
-        then
-          echo ', "operation": "'"$INPUT_OPERATION"'" ' >> /tmp/payload.json
+        if [ -n "$INPUT_OPERATION" ]; then
+          echo ', "operation": "'"$INPUT_OPERATION"'"' >> /tmp/payload.json
         else
-          echo ', "operation": "'REPLACE'"' >> /tmp/payload.json
+          echo ', "operation": "REPLACE"' >> /tmp/payload.json
         fi
         
         echo ' }' >> /tmp/payload.json
