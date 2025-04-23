@@ -1,2 +1,67 @@
 # label-artifact-version
-Add or remove label(s) to an existing artifact version
+= CloudBees action: Add or remove label(s) to an existing artifact version
+
+Use this action to add or remove label(s) to an existing artifact version.
+
+
+== Inputs
+
+[cols="2a,1a,1a,3a",options="header"]
+.Input details
+|===
+
+| Input name
+| Data type
+| Required?
+| Description
+
+| `component-id`
+| String
+| Yes
+| The unique identifier of a component to which the artifact belongs to.
+
+| `artifact-id`
+| String
+| Yes
+| The unique identifier of an artifact.
+
+| `labels`
+| String
+| No
+| List of comma-separated labels.
+
+| `operation`
+| String
+| No
+| The type of action to be performed with labels of an artifact. `ADD`, `REMOVE` or `REPLACE` are options available. `REPLACE` is used as default value.
+
+|===
+
+== Usage example
+
+In your YAML file, add:
+
+[source,yaml]
+----
+jobs:
+success_add_labels_to_artifact_ver:
+steps:
+- name: success_add_labels_to_artifact_ver
+uses: cloudbees-io/label-artifact-version@v1
+with:
+component-id: "065b2595-cd1e-415d-9c5b-cab06074b641"
+artifact-id: "f089759c-9a6c-4c5b-befb-d70ca006625c"
+labels: "Enter,     your labels,here!    , Thanks."
+operation: "ADD"
+
+----
+
+== License
+
+This code is made available under the
+link:https://opensource.org/license/mit/[MIT license].
+
+== References
+
+* Learn more about link:https://docs.cloudbees.com/docs/cloudbees-saas-platform-actions/latest/[using actions in CloudBees workflows].
+* Learn about link:https://docs.cloudbees.com/docs/cloudbees-saas-platform/latest/[the CloudBees platform].
