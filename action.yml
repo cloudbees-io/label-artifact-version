@@ -42,7 +42,7 @@ runs:
         
         echo ' }' >> /tmp/payload.json
         
-        echo </tmp/payload.json
+        cat /tmp/payload.json
         echo "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels"
 
         # Make Platform API call to create artifact_info record
