@@ -20,7 +20,7 @@ runs:
   steps:
     - id: labelArtifactVersion
       name: Label Artifact Version
-      #uses: docker://esolang/jq:latest
+      uses: docker://esolang/jq:latest
       run: |
         #Create payload
         echo '{ "componentId": "'"$INPUT_COMPONENT_ID"'", "artifactId": "'"$INPUT_ARTIFACT_ID"'" ' > /tmp/payload.json 
