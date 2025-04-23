@@ -36,7 +36,7 @@ runs:
         if [ -n "$INPUT_OPERATION" ]; then
           echo ', "operation": "'"$INPUT_OPERATION"'"' >> /tmp/payload.json
         else
-          echo ', "operation": "REPLACE"' >> /tmp/payload.json
+          echo ', "operation": "'"REPLACE"'"' >> /tmp/payload.json
         fi
         
         echo ' }' >> /tmp/payload.json
