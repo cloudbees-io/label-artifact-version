@@ -15,7 +15,6 @@ inputs:
   operation:
     description: 'The type of action to be performed with labels of an artifact. "ADD", "REMOVE" or "REPLACE" are options available. "REPLACE" is used as default value.'
 
-
 runs:
   using: composite
   steps:
