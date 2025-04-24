@@ -22,7 +22,7 @@ Use this action to add or remove label(s) to an existing artifact version.
 | `component-id`
 | String
 | Yes
-| The unique identifier of a component to which the artifact belongs to.
+| The unique identifier of a component to which the artifact belongs.
 
 | `labels`
 | String
