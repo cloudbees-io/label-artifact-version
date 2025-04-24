@@ -14,20 +14,20 @@ Use this action to add or remove label(s) to an existing artifact version.
 | Required?
 | Description
 
-| `component-id`
-| String
-| Yes
-| The unique identifier of a component to which the artifact belongs to.
-
 | `artifact-id`
 | String
 | Yes
 | The unique identifier of an artifact.
 
+| `component-id`
+| String
+| Yes
+| The unique identifier of a component to which the artifact belongs to.
+
 | `labels`
 | String
 | No
-| List of comma-separated labels.
+| A comma-separated list of artifact labels.
 
 | `operation`
 | String
@@ -50,7 +50,7 @@ uses: cloudbees-io/label-artifact-version@v1
 with:
 component-id: "065b2595-cd1e-415d-9c5b-cab06074b641"
 artifact-id: "f089759c-9a6c-4c5b-befb-d70ca006625c"
-labels: "Enter,     your labels,here!    , Thanks."
+labels: "<add,comma,separated,label,list,here>"
 operation: "ADD"
 
 ----
