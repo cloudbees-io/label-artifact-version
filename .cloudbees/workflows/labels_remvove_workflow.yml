@@ -7,9 +7,9 @@ on:
       - "**"
   workflow_dispatch:
 jobs:
-  success_add_labels_to_artifact_ver:
+  success_remove_labels_to_artifact_ver:
     steps:
-      - name: success_add_labels_to_artifact_ver
+      - name: success_remove_labels_to_artifact_ver
         uses: cloudbees-io/label-artifact-version@main
         with:
           component-id: "065b2595-cd1e-415d-9c5b-cab06074b641"
