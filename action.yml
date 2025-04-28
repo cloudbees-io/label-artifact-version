@@ -27,7 +27,7 @@ runs:
         echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json 
 
          # convert to JSON format
-         formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' -e "s/'/\"/g" | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); gsub(/^"+|"+$/, ""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
+         formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");  gsub(/\\"/, "\\\\\""); gsub(/"/, "\\\""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
          echo ' "labels": '"$formatted_labels">> /tmp/payload.json
         
         # operation argument is optional
