@@ -1,6 +1,6 @@
-= CloudBees action: Add or remove label(s) to an existing artifact version
+= CloudBees action: Manage label(s) to an existing artifact version
 
-Use this action to add or remove label(s) to an existing artifact version.
+Use this action to manage label(s) to an existing artifact version.
 
 
 == Inputs
