@@ -14,11 +14,6 @@ Use this action to manage label(s) to an existing artifact version.
 | Required?
 | Description
 
-| `artifact-id`
-| String
-| Yes
-| The unique identifier of an artifact.
-
 | `component-id`
 | String
 | Yes
@@ -29,10 +24,20 @@ Use this action to manage label(s) to an existing artifact version.
 | No
 | A comma-separated list of artifact labels.
 
+| `name`
+| String
+| Yes
+| The name of the artifact.
+
 | `operation`
 | String
 | No
 | The type of action to be performed with labels of an artifact. `ADD`, `REMOVE` or `REPLACE` are options available. `REPLACE` is used as default value.
+
+| `version`
+| String
+| Yes
+| The version of the artifact.
 
 |===
 
@@ -49,7 +54,8 @@ steps:
 uses: cloudbees-io/label-artifact-version@v1
 with:
 component-id: "065b2595-cd1e-415d-9c5b-cab06074b641"
-artifact-id: "f089759c-9a6c-4c5b-befb-d70ca006625c"
+name: "artifactService"
+version: "v1.0.0"
 labels: "<add,comma,separated,label,list,here>"
 operation: "ADD"
 
