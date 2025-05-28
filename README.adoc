@@ -26,7 +26,7 @@ Use this action to manage label(s) to an existing artifact version.
 
 | `labels`
 | String
-| Yes
+| No
 | A comma-separated list of artifact labels.
 
 | `operation`
