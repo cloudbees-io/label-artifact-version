@@ -4,17 +4,15 @@ name: 'Label artifact version'
 description: 'Add or remove label(s) to an existing artifact version.'
 
 inputs:
-  component-id:
-    description: 'The ID of the component that the artifact belongs to.'
-    required: true
   artifact-id:
     description: 'The unique identifier of the artifact.'
     required: true
   labels:
     description: 'A comma-separated list of artifact labels. If the list is empty, and the operation is "REPLACE", all the existing labels will be removed.'
-    required: false
+    required: true
   operation:
-    description: 'The type of action to be performed with labels of an artifact. "ADD", "REMOVE" or "REPLACE" are options available. "REPLACE" is used as default value.'
+    description: 'The type of action to be performed with labels of an artifact. "ADD" and "REMOVE" are options available. "ADD" is used as default value.'
+    default: ADD
 
 runs:
   using: composite
@@ -23,30 +21,36 @@ runs:
       name: Label Artifact Version
       uses: docker://esolang/jq:latest
       run: |
-        #Create payload
-        echo '{ "component_id": "'"$INPUT_COMPONENT_ID"'", "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json 
+        # Set default operation to ADD if not provided
+        OPERATION=${INPUT_OPERATION:-ADD}
 
-         # convert to JSON format
-         formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");  gsub(/\\"/, "\\\\\""); gsub(/"/, "\\\""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
-         echo ' "labels": '"$formatted_labels">> /tmp/payload.json
+        # Create payload (without operation)
+        echo '{ "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json
+        formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");  gsub(/\\"/, "\\\\\""); gsub(/"/, "\\\""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
+        echo ' "labels": '"$formatted_labels"' }' >> /tmp/payload.json
+
+        # Perform API call based on operation
+        if [ "$OPERATION" = "ADD" ]; then
+
+          # POST request to add labels
+          response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
+            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
+            --data-binary '@/tmp/payload.json') || command_failed=1
+        else # If operation is REMOVE
+
+          # Convert comma-separated labels to encoded query string
+          label_query=$(echo "$INPUT_LABELS" | awk -v ORS='&' '{gsub(/,/, "\n"); print}' | sed 's/&$//')
+          echo "temp label_query=$label_query"
+          label_query=$(echo "$label_query" | awk -F '&' '{for(i=1;i<=NF;i++){printf "labels=%%s&", gensub(/ /, "%20", "g", $i)}}' | sed 's/&$//')
+          echo "final label_query=$label_query"
         
-        # operation argument is optional
-        if [ -n "$INPUT_OPERATION" ]; then
-          echo ', "operation": "'"$INPUT_OPERATION"'"' >> /tmp/payload.json
-        else
-          echo ', "operation": "'"REPLACE"'"' >> /tmp/payload.json
+           # DELETE request to remove labels (labels as encoded query param)
+          response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
+            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") || command_failed=1
         fi
-        
-        echo ' }' >> /tmp/payload.json
-        
-        # Make Platform API call to create label records for artifact info
-        response=$(curl --fail-with-body  -X 'PUT' "$URL/v3/components/$INPUT_COMPONENT_ID/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
-          -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
-          --data-binary '@/tmp/payload.json') || command_failed=1
-       
+
         # Check curl exit code
-        if [ ${command_failed:-0} -eq 1 ];
-        then
+        if [ ${command_failed:-0} -eq 1 ]; then
           echo "Platform API call failed with error: '$response'"
           exit 1
         fi
@@ -54,7 +58,5 @@ runs:
         JWT: ${{ cloudbees.api.token }}
         URL: ${{ cloudbees.api.url }}
         INPUT_ARTIFACT_ID: ${{ inputs.artifact-id }}
-        INPUT_COMPONENT_ID: ${{ inputs.component-id }}
         INPUT_LABELS: ${{ inputs.labels }}
         INPUT_OPERATION: ${{ inputs.operation }}
-
