@@ -4,6 +4,9 @@ name: 'Label artifact version'
 description: 'Add or remove label(s) to an existing artifact version.'
 
 inputs:
+  organization-id:
+    description: 'The organization to which the artifact belongs.'
+    required: true
   artifact-id:
     description: 'The unique identifier of the artifact.'
     required: true

@@ -12,6 +12,7 @@ jobs:
       - name: success_add_labels_to_artifact_ver
         uses: cloudbees-io/label-artifact-version@main
         with:
-          artifact-id: "f089759c-9a6c-4c5b-befb-d70ca006625c"
+          organization-id: "afe8b140-c7ae-4dab-46e3-4c263a56f483"
+          artifact-id: "ea07033d-3008-40ec-9e50-a0efce7493d8"
           labels: "Enter,     your labels,here!    , Thanks."
           operation: "ADD"
