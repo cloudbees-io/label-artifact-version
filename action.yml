@@ -39,9 +39,20 @@ runs:
         else # If operation is REMOVE
 
           # Convert comma-separated labels to encoded query string
-          label_query=$(echo "$INPUT_LABELS" | awk -v ORS='&' '{gsub(/,/, "\n"); print}' | sed 's/&$//')
-          echo "temp label_query=$label_query"
-          label_query=$(echo "$label_query" | awk -F '&' '{for(i=1;i<=NF;i++){printf "labels=%%s&", gensub(/ /, "%20", "g", $i)}}' | sed 's/&$//')
+          label_query=""
+          IFS=',' read -ra LABELS <<< "$INPUT_LABELS"
+          for label in "${LABELS[@]}"; do
+            # Remove leading/trailing whitespace and encode spaces as %20:
+            label_trimmed=$(echo "$label" | xargs)
+            label_encoded=$(echo "$label_trimmed" | sed 's/ /%20/g')
+            
+            if [ -n "$label_query" ]; then
+              label_query+="&"
+            fi
+            
+            label_query+="labels=$label_encoded"
+          done
+          
           echo "final label_query=$label_query"
         
            # DELETE request to remove labels (labels as encoded query param)
