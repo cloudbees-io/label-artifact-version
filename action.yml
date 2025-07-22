@@ -45,27 +45,28 @@ runs:
             # Remove leading/trailing whitespace and encode spaces as %20:
             label_trimmed=$(echo "$label" | xargs)
             label_encoded=$(echo "$label_trimmed" | sed 's/ /%20/g')
-            
+        
             if [ -n "$label_query" ]; then
               label_query+="&"
             fi
-            
+        
             label_query+="labels=$label_encoded"
           done
-          
+        
           echo "final label_query=$label_query"
         
-           # DELETE request to remove labels (labels as encoded query param)
-          if ! response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
-            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") ; then 
-            command_failed=1
-          fi
+          # DELETE request to remove labels (labels as encoded query param)
+          response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
+           -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
+           if [ $? -ne 0 ]; then
+             command_failed=1
+           fi
 
-          # Check curl exit code
-          if [ ${command_failed:-0} -eq 1 ]; then
-            echo "Platform API call failed with error: '$response'"
-            exit 1
-          fi
+         # Check curl exit code
+         if [ ${command_failed:-0} -eq 1 ]; then
+           echo "Platform API call failed with error: '$response'"
+           exit 1
+         fi
         fi
       env:
         JWT: ${{ cloudbees.api.token }}
