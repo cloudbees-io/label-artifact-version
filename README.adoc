@@ -14,11 +14,6 @@ Use this action to manage label(s) of an existing artifact version.
 | Required?
 | Description
 
-| `organization-id`
-| String
-| Yes
-| The organization to which the artifact belongs.
-
 | `artifact-id`
 | String
 | Yes
@@ -48,7 +43,6 @@ jobs:
           - name: success_add_labels_to_artifact_ver
             uses: cloudbees-io/label-artifact-version@v1
             with:
-              organization-id: "afe8b140-c7ae-4dab-46e3-4c263a56f483"
               artifact-id: "ea07033d-3008-40ec-9e50-a0efce7493d8"
               labels: "<add,comma,separated,label,list,here>"
               operation: "ADD"
