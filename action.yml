@@ -23,19 +23,37 @@ runs:
       run: |
         # Set default operation to ADD if not provided
         OPERATION=${INPUT_OPERATION:-ADD}
-
-        # Create payload (without operation)
-        echo '{ "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json
-        formatted_labels=$(echo "$INPUT_LABELS" | sed -e 's/[][]//g' | awk -v RS=, -v ORS=, '{ gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");  gsub(/\\"/, "\\\\\""); gsub(/"/, "\\\""); printf "\"%s\",", $0 }' | sed 's/,$//' | sed 's/^/[/; s/$/]/')
-        echo ' "labels": '"$formatted_labels"' }' >> /tmp/payload.json
-
+        
         # Perform API call based on operation
         if [ "$OPERATION" = "ADD" ]; then
+          # Create payload (without operation)
+          echo '{ "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json
+          
+          # Take the value of the INPUT_LABELS variable, remove '[' and ']' characters,
+          # then process it to convert a comma-separated list of labels into a properly
+          # quoted JSON array, and store it in formatted_labels
+    
+          formatted_labels=$(
+            echo "$INPUT_LABELS" |                          # Output the value of INPUT_LABELS
+            sed -e 's/[][]//g' |                            # Remove all [ and ] characters
+            awk -v RS=, -v ORS=, '{                         # Split on commas (each label is a record)
+              gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");          # Trim leading/trailing whitespace for each label
+              gsub(/\\"/, "\\\\\"");                        # Escape any existing backslash-quote \" as \\\"
+              gsub(/"/, "\\\"");                            # Escape regular quotes " as \"
+              printf "\"%s\",", $0                          # Output as: "label",
+            }' |
+            sed 's/,$//' |                                  # Remove the trailing comma after the last label
+            sed 's/^/[/; s/$/]/'                            # Add '[' at the start and ']' at the end, making a JSON array
+          )
+  
+          # Append the formatted labels as a JSON field to /tmp/payload.json
+          echo ' "labels": '"$formatted_labels"' }' >> /tmp/payload.json
 
           # POST request to add labels
           response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
             -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
             --data-binary '@/tmp/payload.json') || command_failed=1
+        
         else # If operation is REMOVE
 
           # Convert comma-separated labels to encoded query string
