@@ -26,28 +26,28 @@ runs:
         
         # Perform API call based on operation
         if [ "$OPERATION" = "ADD" ]; then
-          # Create payload (without operation)
-          echo '{ "artifact_id": "'"$INPUT_ARTIFACT_ID"'", ' > /tmp/payload.json
+          
+          # Create payload
           
           # Take the value of the INPUT_LABELS variable, 
           # then process it to convert a comma-separated list of labels into a properly
           # quoted JSON array, and store it in formatted_labels
     
           formatted_labels=$(
-            echo "$INPUT_LABELS" |                          # Output the value of INPUT_LABELS
-            awk -v RS=, -v ORS=, '{                         # Split on commas (each label is a record)
-              gsub(/\\"/, "\\\\\"");                        # Escape any existing backslash-quote \" as \\\"
-              gsub(/"/, "\\\"");                            # Escape regular quotes " as \"
-              printf "\"%s\",", $0                          # Output as: "label",
-            }' |
-            sed 's/,$//' |                                  # Remove the trailing comma after the last label
-            sed 's/^/[/; s/$/]/'                            # Add '[' at the start and ']' at the end, making a JSON array
+             echo "$INPUT_LABELS" | awk -F',' '{
+                 for (i=1;i<=NF;i++) {
+                    gsub(/"/, "\\\"",$i)          # escape double quotes
+                    printf "\"%s\"",$i
+                    if (i<NF) printf ","
+                 }
+             }'
           )
-  
-          # Append the formatted labels as a JSON field to /tmp/payload.json
-          printf ' "labels": %s }' "$formatted_labels" >> /tmp/payload.json
-        
-          printf "Payload JSON: %s\n" "$(cat /tmp/payload.json)"
+          
+          # Compose your JSON (single line)
+          echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
+
+          # View it
+          cat /tmp/payload.json
 
           # POST request to add labels
           response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
