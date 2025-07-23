@@ -29,20 +29,25 @@ runs:
             echo "Adding labels to artifact version with ID: $INPUT_ARTIFACT_ID"
         
           # Use Python to split labels, preserve whitespace and escape handling
-          formatted_labels=$(python3 <<EOF
-            import re, sys
-            s = sys.argv[1]
-            # Split string on unescaped commas
-            labels = re.findall(r"(?:[^\\\\,]|\\\\.)+", s)
-            print(f"Labels found: {labels}")
-            # Unescape commas and backslashes
-            labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
-            print(f"Processed labels: {labels}")
-            # join labels with quotes for JSON format
-            print(",".join([f'"{l}"' for l in labels]))
-            EOF
-              "$INPUT_LABELS"
-          )
+          python3 > /tmp/formatted_labels.txt "$INPUT_LABELS" <<EOF
+          import re, sys
+          s = sys.argv[1]
+          
+          # Split string on unescaped commas
+          labels = re.findall(r"(?:[^\\\\,]|\\\\.)+", s)
+          print(f"Labels found: {labels}")
+          
+          # Unescape commas and backslashes
+          labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
+          print(f"Processed labels: {labels}")
+          
+          # join labels with quotes for JSON format
+          print(",".join([f'"{l}"' for l in labels]))
+          EOF
+
+          # Get the last line from the Python output (the JSON-formatted labels)
+          formatted_labels=$(tail -n 1 /tmp/formatted_labels.txt)
+        
           echo "Formatted labels: $formatted_labels"
         
           # Compose JSON payload for API POST
