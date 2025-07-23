@@ -46,9 +46,6 @@ runs:
           # Compose your JSON (single line)
           echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
 
-          # View it
-          cat /tmp/payload.json
-
           # POST request to add labels
           response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
             -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
@@ -61,23 +58,29 @@ runs:
           fi
         
         else # If operation is REMOVE
-
-          # Convert comma-separated labels to encoded query string
+           # Function to URL-encode using Python 3
+           urlencode() {
+              python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
+           }
+        
+          # Build query string from labels
           label_query=""
           OLD_IFS="$IFS"
           IFS=','
+          
           for label in $INPUT_LABELS; do
-            # Remove leading/trailing whitespace and encode spaces as %20:
-            # label_trimmed=$(echo "$label" | xargs)
-            label_encoded=$(echo "$label" | sed 's/ /%20/g')
+            encoded=$(urlencode "$label")
             if [ -n "$label_query" ]; then
               label_query="${label_query}&"
             fi
-            label_query="${label_query}labels=$label_encoded"
+            label_query="${label_query}labels=${encoded}"
           done
+          
           IFS="$OLD_IFS"
+          
           echo "final label_query=$label_query"
-        
+  
+
           # DELETE request to remove labels (labels as encoded query param)
           response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
