@@ -54,6 +54,12 @@ runs:
             -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
             --data-binary '@/tmp/payload.json') || command_failed=1
         
+          # Check curl exit code
+          if [ ${command_failed:-0} -eq 1 ]; then
+            echo "Platform API call failed with error: '$response'"
+            exit 1
+          fi
+        
         else # If operation is REMOVE
 
           # Convert comma-separated labels to encoded query string
