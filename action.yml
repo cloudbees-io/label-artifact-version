@@ -29,10 +29,7 @@ runs:
           
           # Create payload
           
-          # Take the value of the INPUT_LABELS variable, 
-          # then process it to convert a comma-separated list of labels into a properly
-          # quoted JSON array, and store it in formatted_labels
-    
+          # Format labels as a JSON array    
           formatted_labels=$(
              echo "$INPUT_LABELS" | awk -F',' '{
                  for (i=1;i<=NF;i++) {
@@ -43,7 +40,7 @@ runs:
              }'
           )
           
-          # Compose your JSON (single line)
+          # Compose JSON payload
           echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
 
           # POST request to add labels
@@ -58,7 +55,7 @@ runs:
           fi
         
         else # If operation is REMOVE
-           # Function to URL-encode using Python 3
+           # Function to URL-encode
            urlencode() {
               python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
            }
@@ -78,10 +75,7 @@ runs:
           
           IFS="$OLD_IFS"
           
-          echo "final label_query=$label_query"
-  
-
-          # DELETE request to remove labels (labels as encoded query param)
+          # DELETE request to remove labels
           response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
            if [ $? -ne 0 ]; then
