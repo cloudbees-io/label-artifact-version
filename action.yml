@@ -21,6 +21,8 @@ runs:
       name: Label Artifact Version
       uses: docker://esolang/jq:latest
       run: |
+        bash -c '
+        
         # Set default operation to ADD if not provided
         OPERATION=${INPUT_OPERATION:-ADD}
         
