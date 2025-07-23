@@ -35,9 +35,9 @@ runs:
     
           formatted_labels=$(
             echo "$INPUT_LABELS" |                          # Output the value of INPUT_LABELS
-            sed -e 's/[][]//g' |                            # Remove all [ and ] characters
+            # sed -e 's/[][]//g' |                            # Remove all [ and ] characters
             awk -v RS=, -v ORS=, '{                         # Split on commas (each label is a record)
-              gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");          # Trim leading/trailing whitespace for each label
+              # gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");          # Trim leading/trailing whitespace for each label
               gsub(/\\"/, "\\\\\"");                        # Escape any existing backslash-quote \" as \\\"
               gsub(/"/, "\\\"");                            # Escape regular quotes " as \"
               printf "\"%s\",", $0                          # Output as: "label",
@@ -62,8 +62,8 @@ runs:
           IFS=','
           for label in $INPUT_LABELS; do
             # Remove leading/trailing whitespace and encode spaces as %20:
-            label_trimmed=$(echo "$label" | xargs)
-            label_encoded=$(echo "$label_trimmed" | sed 's/ /%20/g')
+            # label_trimmed=$(echo "$label" | xargs)
+            label_encoded=$(echo "$label" | sed 's/ /%20/g')
             if [ -n "$label_query" ]; then
               label_query="${label_query}&"
             fi
