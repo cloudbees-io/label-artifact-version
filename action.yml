@@ -21,91 +21,92 @@ runs:
       name: Label Artifact Version
       uses: docker://esolang/jq:latest
       run: |
-        bash -c '
-        
         # Set default operation to ADD if not provided
         OPERATION=${INPUT_OPERATION:-ADD}
         
-        # Function to URL-encode a string
-        urlencode() {
-          python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
-        }
-        
-         # --- Split on unescaped commas, retain whitespace ---
-          labels=()
-          buf=""
-          escaped=0
-          INPUT_LABELS="${INPUT_LABELS:-}"
-          len="${#INPUT_LABELS}" 
-        
-          for ((i=0; i<$len; i++)); do
-            ch="${INPUT_LABELS:i:1}"
-            if [[ "$ch" == '\' ]]; then
-              buf+="$ch"
-              escaped=1
-            elif [[ "$ch" == ',' && $escaped -ne 1 ]]; then
-              labels+=("$buf")
-              buf=""
-              escaped=0
-            else
-              buf+="$ch"
-              escaped=0
-            fi
-          done
-          labels+=("$buf")
-          
-          if [[ "$OPERATION" == "ADD" ]]; then
-            # --- Build JSON array ---
-            formatted_labels=""
-            for lbl in "${labels[@]}"; do
-              lbl_escaped="${lbl//\"/\\\"}"
-              if [[ -n "$formatted_labels" ]]; then
-                formatted_labels+=","
-              fi
-              formatted_labels+="\"$lbl_escaped\""
-            done
-        
-            # Compose JSON payload
-            echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
+        if [ "$OPERATION" = "ADD" ]; then
 
-          # POST request to add labels
-          response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
-            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
-            --data-binary '@/tmp/payload.json') || command_failed=1
+          # Use Python to split INPUT_LABELS by commas, but preserve commas and slashes that are escaped.
+          # The regex (?:[^\\\\,]|\\\\.)+ matches either any character except backslash/comma or an escaped character.
+          # After splitting, we unescape \, to comma and \\ to backslash.
+          formatted_labels=$(
+            python3 -c '
+            import sys, re
+            s = sys.argv[1]
+            
+            # Split string on unescaped commas
+            labels = re.findall(r"(?:[^\\\\,]|\\\\.)+", s)
+            
+            # Unescape commas and backslashes
+            labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
+           
+            # Each label is JSON quoted and joined with commas
+            print(",".join([f"\\"{l}\\"" for l in labels]))
+            ' "$INPUT_LABELS"
+          )
         
-          # Check curl exit code
+          # Compose JSON payload for API POST
+          echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
+        
+          # POST request to add the given labels
+          response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
+          -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
+          --data-binary '@/tmp/payload.json') || command_failed=1
+          
+          # Check if curl POST call failed and report error if so
           if [ ${command_failed:-0} -eq 1 ]; then
             echo "Platform API call failed with error: '$response'"
             exit 1
           fi
         
-        else # If operation is REMOVE
-          
-          # Build labels=...&labels=... query string for deletion
+        else # REMOVE operation block
+        
+          # Helper function to URL-encode strings using Python
+          urlencode() {
+            python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
+          }
+        
+          # Use Python again to split and unescape the label list
+          labels_list=$(
+            python3 -c '
+            import sys, re
+            s = sys.argv[1]
+            
+            # Split string on unescaped commas
+            labels = re.findall(r"(?:[^\\\\,]|\\\\.)+", s)
+            
+            # Unescape commas and backslashes
+            labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
+            
+            # Print each label on a new line
+            print("\n".join([l for l in labels]))
+            ' "$INPUT_LABELS"
+          )
+        
+          # Construct query string for DELETE, URL-encoding each processed label
           label_query=""
-          for label in "${labels[@]}"; do
+          while IFS= read -r label; do
             encoded=$(urlencode "$label")
-            if [[ -n "$label_query" ]]; then
+            if [ -n "$label_query" ]; then
               label_query="${label_query}&"
             fi
             label_query="${label_query}labels=${encoded}"
-          done
-      
-          echo "final label_query = $label_query"
-          
-          # DELETE request to remove labels
+          done <<< "$labels_list"
+        
+          # DELETE request to remove given labels from artifact
           response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
-           -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
-           if [ $? -ne 0 ]; then
-             command_failed=1
-           fi
-
-         # Check curl exit code
-         if [ ${command_failed:-0} -eq 1 ]; then
-           echo "Platform API call failed with error: '$response'"
-           exit 1
-         fi
-        fi
+        -H "Authorization: Bearer $JWT" -H "Content-Type: application/json")
+          if [ $? -ne 0 ]; then
+          command_failed=1
+          fi
+        
+          # Check if curl DELETE call failed and report error if so
+          if [ ${command_failed:-0} -eq 1 ]; then
+        echo "Platform API call failed with error: '$response'"
+          exit 1
+          fi
+          
+          fi
       env:
         JWT: ${{ cloudbees.api.token }}
         URL: ${{ cloudbees.api.url }}
