@@ -46,7 +46,8 @@ runs:
           )
   
           # Append the formatted labels as a JSON field to /tmp/payload.json
-          echo ' "labels": '"$formatted_labels"' }' >> /tmp/payload.json
+          printf ' "labels": %s }' "$formatted_labels" >> /tmp/payload.json
+          #echo ' "labels": '"$formatted_labels"' }' >> /tmp/payload.json
         
           echo "Payload for POST request: $(cat /tmp/payload.json)"
 
