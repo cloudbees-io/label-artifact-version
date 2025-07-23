@@ -29,8 +29,7 @@ runs:
           # Use Python to split INPUT_LABELS by commas, but preserve commas and slashes that are escaped.
           # The regex (?:[^\\\\,]|\\\\.)+ matches either any character except backslash/comma or an escaped character.
           # After splitting, we unescape \, to comma and \\ to backslash.
-          formatted_labels=$(
-            python3 -c '
+          formatted_labels=$(python3 <<EOF
             import sys, re
             s = sys.argv[1]
             
@@ -41,8 +40,9 @@ runs:
             labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
            
             # Each label is JSON quoted and joined with commas
-            print(",".join([f"\\"{l}\\"" for l in labels]))
-            ' "$INPUT_LABELS"
+            print(",".join([f'"{l}"' for l in labels]))
+            EOF
+              "$INPUT_LABELS"
           )
         
           # Compose JSON payload for API POST
@@ -67,8 +67,7 @@ runs:
           }
         
           # Use Python again to split and unescape the label list
-          labels_list=$(
-            python3 -c '
+          labels_list=$(python3 <<EOF
             import sys, re
             s = sys.argv[1]
             
@@ -79,7 +78,7 @@ runs:
             labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
             
             # Print each label on a new line
-            print("\n".join([l for l in labels]))
+            print("\\n".join([l for l in labels]))
             ' "$INPUT_LABELS"
           )
         
