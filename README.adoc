@@ -1,6 +1,6 @@
-= CloudBees action: Manage label(s) to an existing artifact version
+= CloudBees action: Manage label(s) of an existing artifact version
 
-Use this action to manage label(s) to an existing artifact version.
+Use this action to manage label(s) of an existing artifact version.
 
 
 == Inputs
@@ -19,20 +19,15 @@ Use this action to manage label(s) to an existing artifact version.
 | Yes
 | The unique identifier of an artifact.
 
-| `component-id`
-| String
-| Yes
-| The unique identifier of a component to which the artifact belongs.
-
 | `labels`
 | String
-| No
+| Yes
 | A comma-separated list of artifact labels.
 
 | `operation`
 | String
 | No
-| The type of action to be performed with labels of an artifact. `ADD`, `REMOVE` or `REPLACE` are options available. `REPLACE` is used as default value.
+| The type of action to be performed with labels of an artifact. `ADD` and `REMOVE` are available options. `ADD` is used by default.
 
 |===
 
@@ -48,8 +43,7 @@ jobs:
           - name: success_add_labels_to_artifact_ver
             uses: cloudbees-io/label-artifact-version@v1
             with:
-              component-id: "065b2595-cd1e-415d-9c5b-cab06074b641"
-              artifact-id: "f089759c-9a6c-4c5b-befb-d70ca006625c"
+              artifact-id: "ea07033d-3008-40ec-9e50-a0efce7493d8"
               labels: "<add,comma,separated,label,list,here>"
               operation: "ADD"
 
