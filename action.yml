@@ -36,7 +36,6 @@ runs:
           formatted_labels=$(
             echo "$INPUT_LABELS" |                          # Output the value of INPUT_LABELS
             awk -v RS=, -v ORS=, '{                         # Split on commas (each label is a record)
-              # gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, "");          # Trim leading/trailing whitespace for each label
               gsub(/\\"/, "\\\\\"");                        # Escape any existing backslash-quote \" as \\\"
               gsub(/"/, "\\\"");                            # Escape regular quotes " as \"
               printf "\"%s\",", $0                          # Output as: "label",
@@ -47,9 +46,8 @@ runs:
   
           # Append the formatted labels as a JSON field to /tmp/payload.json
           printf ' "labels": %s }' "$formatted_labels" >> /tmp/payload.json
-          #echo ' "labels": '"$formatted_labels"' }' >> /tmp/payload.json
         
-          echo "Payload for POST request: $(cat /tmp/payload.json)"
+          printf "Payload JSON: %s\n" "$(cat /tmp/payload.json)"
 
           # POST request to add labels
           response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
