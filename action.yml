@@ -29,17 +29,37 @@ runs:
           
           # Create payload
           
-          # Format labels as a JSON array    
-          formatted_labels=$(
-             echo "$INPUT_LABELS" | awk -F',' '{
-                 for (i=1;i<=NF;i++) {
-                    gsub(/"/, "\\\"",$i)          # escape double quotes
-                    printf "\"%s\"",$i
-                    if (i<NF) printf ","
-                 }
-             }'
-          )
+         # --- Split on unescaped commas, retain whitespace ---
+          labels=()
+          buf=""
+          escaped=0
+          len=${#INPUT_LABELS}
+          for ((i=0; i<$len; i++)); do
+            ch="${INPUT_LABELS:i:1}"
+            if [[ $ch == '\' ]]; then
+              buf+="$ch"
+              escaped=1
+            elif [[ $ch == ',' && $escaped -ne 1 ]]; then
+              labels+=("$buf")
+              buf=""
+              escaped=0
+            else
+              buf+="$ch"
+              escaped=0
+            fi
+          done
+          labels+=("$buf")
           
+          # --- Escape double quotes for JSON and join labels ---
+          formatted_labels=""
+          for lbl in "${labels[@]}"; do
+            lbl_escaped="${lbl//\"/\\\"}"
+            if [[ -n "$formatted_labels" ]]; then
+              formatted_labels+=","
+            fi
+            formatted_labels+="\"$lbl_escaped\""
+          done
+
           # Compose JSON payload
           echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
 
@@ -55,17 +75,30 @@ runs:
           fi
         
         else # If operation is REMOVE
-           # Function to URL-encode
-           urlencode() {
-              python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
-           }
-        
-          # Build query string from labels
-          label_query=""
-          OLD_IFS="$IFS"
-          IFS=','
+           # Split INPUT_LABELS on unescaped commas (preserving spaces, backslashes, etc)
+          labels=()
+          buf=""
+          escaped=0
+          len=${#INPUT_LABELS}
+          for ((i=0; i<$len; i++)); do
+          ch="${INPUT_LABELS:i:1}"
+            if [[ $ch == '\' ]]; then
+              buf+="$ch"
+              escaped=1
+            elif [[ $ch == ',' && $escaped -ne 1 ]]; then
+              labels+=("$buf")
+              buf=""
+              escaped=0
+            else
+              buf+="$ch"
+              escaped=0
+            fi
+          done
+          labels+=("$buf")
           
-          for label in $INPUT_LABELS; do
+          # Build labels=...&labels=... query string
+          label_query=""
+          for label in "${labels[@]}"; do
             encoded=$(urlencode "$label")
             if [ -n "$label_query" ]; then
               label_query="${label_query}&"
@@ -73,8 +106,8 @@ runs:
             label_query="${label_query}labels=${encoded}"
           done
           
-          IFS="$OLD_IFS"
-          
+          echo "final label_query = $label_query"
+        
           # DELETE request to remove labels
           response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
