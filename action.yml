@@ -26,24 +26,24 @@ runs:
         
         if [ "$OPERATION" = "ADD" ]; then
 
-          # Use Python to split INPUT_LABELS by commas, but preserve commas and slashes that are escaped.
-          # The regex (?:[^\\\\,]|\\\\.)+ matches either any character except backslash/comma or an escaped character.
-          # After splitting, we unescape \, to comma and \\ to backslash.
+            echo "Adding labels to artifact version with ID: $INPUT_ARTIFACT_ID"
+        
+          # Use Python to split labels, preserve whitespace and escape handling
           formatted_labels=$(python3 <<EOF
-            import sys, re
+            import re, sys
             s = sys.argv[1]
-            
             # Split string on unescaped commas
             labels = re.findall(r"(?:[^\\\\,]|\\\\.)+", s)
-            
+            print(f"Labels found: {labels}")
             # Unescape commas and backslashes
             labels = [l.replace("\\,", ",").replace("\\\\", "\\") for l in labels]
-           
-            # Each label is JSON quoted and joined with commas
+            print(f"Processed labels: {labels}")
+            # join labels with quotes for JSON format
             print(",".join([f'"{l}"' for l in labels]))
             EOF
               "$INPUT_LABELS"
           )
+          echo "Formatted labels: $formatted_labels"
         
           # Compose JSON payload for API POST
           echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
