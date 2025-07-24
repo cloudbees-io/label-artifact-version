@@ -17,7 +17,7 @@ To learn more about organizing your artifacts using labels, refer to link:https:
 | `artifact-id`
 | String
 | Yes
-| The unique identifier of an artifact reported to the CloudBees platform.
+| The unique identifier of an artifact version reported to the CloudBees platform.
 
 | `labels`
 | String
@@ -38,7 +38,7 @@ The default is `ADD`.
 
 == Usage examples
 
-The following basic example adds the labels `For Production` and `Testing Passed` to an existing artifact:
+The following basic example adds the labels `For Production` and `Testing Passed` to an existing artifact version:
 
 [source,yaml]
 ----
