@@ -60,7 +60,7 @@ Invoking this action removes the `Label2` and `Label3` labels, so that the artif
 ----
         steps:
         - name: Unlabel an artifact version
-          uses: cloudbees-io-gha/label-artifact-version@v1
+          uses: cloudbees-io/label-artifact-version@v1
           with:
             artifact-id: 1234abcd-56ef-78gh-90ij-klmnop123456
             labels: Label2,Label3
