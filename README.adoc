@@ -27,7 +27,7 @@ To learn more about organizing your artifacts using labels, refer to link:https:
 | `operation`
 | String
 | No
-| The labelling activity to be performed.
+| The labeling activity to be performed.
 The following options are valid:
 
 * `ADD`, to apply label(s).
