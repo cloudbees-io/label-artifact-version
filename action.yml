@@ -54,7 +54,7 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-              printf "Added '%s' labels to artifact version '%s'.\n" "$INPUT_LABELS" "$INPUT_ARTIFACT_ID" > $CLOUDBEES_OUTPUTS/artifact-id_labels_added
+            echo "Added labels '$INPUT_LABELS' to artifact version '$INPUT_ARTIFACT_ID'."
           fi
         
         else # If operation is REMOVE
@@ -91,7 +91,7 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            printf "Removed '%s' labels from artifact version '%s'.\n" "$INPUT_LABELS" "$INPUT_ARTIFACT_ID" > $CLOUDBEES_OUTPUTS/artifact-id_labels_removed
+            echo "Removed labels '$INPUT_LABELS' from artifact version '$INPUT_ARTIFACT_ID'."
          fi
         fi
       env:
