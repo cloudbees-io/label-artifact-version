@@ -52,6 +52,9 @@ runs:
           if [ ${command_failed:-0} -eq 1 ]; then
             echo "Platform API call failed with error: '$response'"
             exit 1
+          else
+            # If successful, show the labels added
+              printf "Added '%s' labels to artifact version '%s'.\n" "$INPUT_LABELS" "$INPUT_ARTIFACT_ID" > $CLOUDBEES_OUTPUTS/artifact-id_labels_added
           fi
         
         else # If operation is REMOVE
@@ -82,10 +85,13 @@ runs:
              command_failed=1
            fi
 
-         # Check curl exit code
-         if [ ${command_failed:-0} -eq 1 ]; then
-           echo "Platform API call failed with error: '$response'"
-           exit 1
+          # Check curl exit code
+          if [ ${command_failed:-0} -eq 1 ]; then
+            echo "Platform API call failed with error: '$response'"
+            exit 1
+          else
+            # If successful, show the labels added
+            printf "Removed '%s' labels from artifact version '%s'.\n" "$INPUT_LABELS" "$INPUT_ARTIFACT_ID" > $CLOUDBEES_OUTPUTS/artifact-id_labels_removed
          fi
         fi
       env:
