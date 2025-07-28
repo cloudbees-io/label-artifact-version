@@ -41,7 +41,7 @@ runs:
           )
           
           # Compose JSON payload
-          echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
+          printf '{ "artifact_id": "%s", "labels": [%s] }\n' "$INPUT_ARTIFACT_ID" "$formatted_labels" > /tmp/payload.json
 
           # POST request to add labels
           response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
