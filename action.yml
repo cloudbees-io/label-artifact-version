@@ -44,7 +44,7 @@ runs:
           echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
 
           # POST request to add labels
-          response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
+          response=$(curl -s --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
             -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
             --data-binary '@/tmp/payload.json') || command_failed=1
         
@@ -52,6 +52,15 @@ runs:
           if [ ${command_failed:-0} -eq 1 ]; then
             echo "Platform API call failed with error: '$response'"
             exit 1
+          else
+            # If successful, show the labels added
+            echo "Labels added to artifact id, '$INPUT_ARTIFACT_ID' are:"
+            # Split on comma while keeping quotes
+            IFS=','
+            
+            for val in $INPUT_LABELS; do
+              echo "'$val'"
+            done
           fi
         
         else # If operation is REMOVE
@@ -76,17 +85,26 @@ runs:
           IFS="$OLD_IFS"
           
           # DELETE request to remove labels
-          response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
+          response=$(curl -s --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
            if [ $? -ne 0 ]; then
              command_failed=1
            fi
 
-         # Check curl exit code
-         if [ ${command_failed:-0} -eq 1 ]; then
-           echo "Platform API call failed with error: '$response'"
-           exit 1
-         fi
+          # Check curl exit code
+          if [ ${command_failed:-0} -eq 1 ]; then
+            echo "Platform API call failed with error: '$response'"
+            exit 1
+          else
+            # If successful, show the labels added
+            echo "Labels removed from artifact id, '$INPUT_ARTIFACT_ID' are:"
+            # Split on comma while keeping quotes
+            IFS=','
+        
+            for val in $INPUT_LABELS; do
+              echo "'$val'"
+            done
+          fi
         fi
       env:
         JWT: ${{ cloudbees.api.token }}
