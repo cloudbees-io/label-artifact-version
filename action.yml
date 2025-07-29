@@ -41,10 +41,10 @@ runs:
           )
           
           # Compose JSON payload
-          printf '{ "artifact_id": "%s", "labels": [%s] }\n' "$INPUT_ARTIFACT_ID" "$formatted_labels" > /tmp/payload.json
+          echo "{ \"artifact_id\": \"${INPUT_ARTIFACT_ID}\", \"labels\": [${formatted_labels}] }" > /tmp/payload.json
 
           # POST request to add labels
-          response=$(curl --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
+          response=$(curl -s --fail-with-body -X 'POST' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels" \
             -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
             --data-binary '@/tmp/payload.json') || command_failed=1
         
