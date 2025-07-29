@@ -54,7 +54,7 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "Labels Added to artifact id, '$INPUT_ARTIFACT_ID' are:"
+            echo "Labels added to artifact id, '$INPUT_ARTIFACT_ID' are:"
              # Parse and print labels
             echo "$INPUT_LABELS" | jq -r '.[]'
           fi
