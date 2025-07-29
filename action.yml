@@ -54,14 +54,9 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            printLabels()
             echo "Labels Added to artifact id, '$INPUT_ARTIFACT_ID' are:"
-            # Split on comma while keeping quotes
-            IFS=','
-            
-            for val in $INPUT_LABELS; do
-              echo "'$val'"
-            done
+             # Parse and print labels
+            echo "$INPUT_LABELS" | jq -r '.[]'
           fi
         
         else # If operation is REMOVE
@@ -98,19 +93,14 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "Labels Removed from artifact id, '$INPUT_ARTIFACT_ID' are:"
-            # Split on comma while keeping quotes
-            IFS=','
-        
-            for val in $INPUT_LABELS; do
-              echo "'$val'"
-            done
+            echo "Labels removed from artifact id, '$INPUT_ARTIFACT_ID' are:"
+            # Parse and print labels
+            echo "$INPUT_LABELS" | jq -r '.[]'
           fi
         fi
         
         printLabels() {
-            # Parse and print labels
-            echo "$INPUT_LABELS" | jq -r '.[]'
+           
         }
       env:
         JWT: ${{ cloudbees.api.token }}
