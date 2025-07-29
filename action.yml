@@ -54,7 +54,9 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "Added labels '$INPUT_LABELS' to artifact version '$INPUT_ARTIFACT_ID'."
+            echo "Labels Added to artifact version '$INPUT_ARTIFACT_ID' are:"
+            # Split on comma while keeping quotes
+            echo "$formatted_labels" | tr ',' '\n'
           fi
         
         else # If operation is REMOVE
@@ -91,7 +93,9 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "Removed labels '$INPUT_LABELS' from artifact version '$INPUT_ARTIFACT_ID'."
+            echo "Labels Removed from artifact version '$INPUT_ARTIFACT_ID' are:"
+            # Split on comma while keeping quotes
+            echo "$INPUT_LABELS" | awk -F, '{for(i=1;i<=NF;i++) printf "\"%s\"\n",$i}'
          fi
         fi
       env:
