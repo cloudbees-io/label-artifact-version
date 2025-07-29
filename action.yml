@@ -54,9 +54,9 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "Labels Added to artifact version '$INPUT_ARTIFACT_ID' are:"
+            echo "Labels Added to artifact id, '$INPUT_ARTIFACT_ID' are:"
             # Split on comma while keeping quotes
-            echo "$formatted_labels" | tr ',' '\n'
+            echo "$INPUT_LABELS" | awk -F, '{for(i=1;i<=NF;i++) printf "'%s'\n",$i}'
           fi
         
         else # If operation is REMOVE
@@ -81,7 +81,7 @@ runs:
           IFS="$OLD_IFS"
           
           # DELETE request to remove labels
-          response=$(curl --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
+          response=$(curl -s --fail-with-body -X 'DELETE' "$URL/v3/artifactinfos/$INPUT_ARTIFACT_ID/labels?$label_query" \
            -H "Authorization: Bearer $JWT" -H "Content-Type: application/json") 
            if [ $? -ne 0 ]; then
              command_failed=1
@@ -93,9 +93,9 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "Labels Removed from artifact version '$INPUT_ARTIFACT_ID' are:"
+            echo "Labels Removed from artifact id, '$INPUT_ARTIFACT_ID' are:"
             # Split on comma while keeping quotes
-            echo "$INPUT_LABELS" | awk -F, '{for(i=1;i<=NF;i++) printf "\"%s\"\n",$i}'
+            echo "$INPUT_LABELS" | awk -F, '{for(i=1;i<=NF;i++) printf "'%s'\n",$i}'
          fi
         fi
       env:
