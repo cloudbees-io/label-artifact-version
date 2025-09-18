@@ -66,6 +66,7 @@ runs:
             # Fold the string at 48 characters
             folded_labels=$(echo "$labels_str" | fold -s -w 48)
         
+            first_line=1
             echo "$folded_labels" | while IFS= read -r line; do
               if [ $first_line -eq 1 ]; then
                 printf "| %-17s | %-50s |\n" "labels" "$line"
@@ -123,6 +124,7 @@ runs:
             # Fold the string at 48 characters
             folded_labels=$(echo "$labels_str" | fold -s -w 48)
             
+            first_line=1
             echo "$folded_labels" | while IFS= read -r line; do
               if [ $first_line -eq 1 ]; then
                 printf "| %-17s | %-50s |\n" "labels" "$line"
