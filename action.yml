@@ -54,11 +54,11 @@ runs:
             exit 1
           else
             # If successful, show the labels added
-            echo "+-------------------+----------------------------------------------------+"
-            printf "| %-17s | %-50s |\n" "Parameter" "Value"
-            echo "+-------------------+----------------------------------------------------+"
-            printf "| %-17s | %-50s |\n" "artifact-id" "$INPUT_ARTIFACT_ID"
-            printf "| %-17s | %-50s |\n" "operation" "$INPUT_OPERATION"
+            echo "+----------------------+----------------------------------------------------+"
+            printf "| \033[1m%-20s\033[0m | \033[1m%-50s\033[0m |\n" "Parameter" "Value"
+            echo "+----------------------+----------------------------------------------------+"
+            printf "| \033[1m%-20s\033[0m | %-50s |\n" "artifact-id" "$INPUT_ARTIFACT_ID"
+            printf "| \033[1m%-20s\033[0m | %-50s |\n" "operation" "$INPUT_OPERATION"
         
             # Join labels as a comma-separated string
             labels_str="$INPUT_LABELS"
@@ -69,10 +69,10 @@ runs:
             first_line=1
             echo "$folded_labels" | while IFS= read -r line; do
               if [ $first_line -eq 1 ]; then
-                printf "| %-17s | %-50s |\n" "labels" "$line"
+                printf "| \033[1m%-20s\033[0m | %-50s |\n" "labels" "$line"
                 first_line=0
               else
-                printf "| %-17s | %-50s |\n" "" "$line"
+                printf "| \033[1m%-20s\033[0m | %-50s |\n" "" "$line"
               fi
             done
             echo "+-------------------+----------------------------------------------------+"
@@ -127,10 +127,10 @@ runs:
             first_line=1
             echo "$folded_labels" | while IFS= read -r line; do
               if [ $first_line -eq 1 ]; then
-                printf "|\033[1m%-20s\033[0m | %-50s |\n" "labels" "$line"
+                printf "| \033[1m%-20s\033[0m | %-50s |\n" "labels" "$line"
                 first_line=0
               else
-                printf "|\033[1m%-20s\033[0m | %-50s |\n" "" "$line"
+                printf "| \033[1m%-20s\033[0m | %-50s |\n" "" "$line"
               fi
             done
             echo "+-------------------+----------------------------------------------------+"
