@@ -82,9 +82,8 @@ runs:
             echo "Platform API call failed with error: '$response'"
             exit 1
           fi
-        
-        # If operation is REMOVE
-        else  if [ "$OPERATION" = "REMOVE" ]; then 
+       
+        elif [ "$OPERATION" = "REMOVE" ]; then 
            # Function to URL-encode
            urlencode() {
               python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
