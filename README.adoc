@@ -23,6 +23,7 @@ To learn more about organizing your artifacts using labels, refer to link:https:
 | String
 | Yes
 | A comma-separated list of artifact labels.
+NOTE: A maximum of 20 labels are allowed per artifact version, with a maximum of 20 characters per label.
 
 | `operation`
 | String
