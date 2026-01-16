@@ -86,7 +86,7 @@ runs:
         elif [ "$OPERATION" = "REMOVE" ]; then 
            # Function to URL-encode
            urlencode() {
-              python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
+              echo -n "$1" | jq -s -R -r @uri
            }
         
           # Build query string from labels
