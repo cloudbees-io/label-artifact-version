@@ -19,7 +19,7 @@ runs:
   steps:
     - id: labelArtifactVersion
       name: Label Artifact Version
-      uses: docker://esolang/jq:latest
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/cb-utils:main-0.1.9
       run: |
         # Function to print inputs in a formatted table
         print_inputs() {
