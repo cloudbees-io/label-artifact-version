@@ -19,7 +19,7 @@ runs:
   steps:
     - id: labelArtifactVersion
       name: Label Artifact Version
-      uses: docker://esolang/jq:latest
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/cb-utils:main-0.1.9
       run: |
         # Function to print inputs in a formatted table
         print_inputs() {
@@ -86,7 +86,7 @@ runs:
         elif [ "$OPERATION" = "REMOVE" ]; then 
            # Function to URL-encode
            urlencode() {
-              python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]), end='')" "$1"
+              echo -n "$1" | jq -s -R -r @uri
            }
         
           # Build query string from labels
