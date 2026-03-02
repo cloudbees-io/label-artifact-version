@@ -1,6 +1,6 @@
 = CloudBees action: Manage artifact version labels
 
-Use this action to create, update, and remove labels on existing artifact versions in the CloudBees platform.
+Use this action to add and remove labels on existing artifact versions in the CloudBees platform.
 To learn more about organizing your artifacts using labels, refer to link:https://docs.cloudbees.com/docs/cloudbees-platform/latest/workflows/artifacts#labels[Artifact labels].
 
 == Inputs
